@@ -193,30 +193,75 @@
     </div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script>
-    // Simulación de interacción local
+    const firebaseConfig = {
+      apiKey: "AIzaSyDHU_KHVA5JezYLPed6Yg93fwCXUSa4qVc",
+      authDomain: "streamplay-mvp.firebaseapp.com",
+      databaseURL: "https://streamplay-mvp-default-rtdb.firebaseio.com",
+      projectId: "streamplay-mvp",
+      storageBucket: "streamplay-mvp.firebasestorage.app",
+      messagingSenderId: "254252838564",
+      appId: "1:254252838564:web:2100d6b3a40d7ac7ce0031"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 1. Botón de ingreso del espectador
     function joinGame() {
-      document.getElementById('mobile-waiting').style.display = 'none';
-      document.getElementById('mobile-question').style.display = 'flex';
-      document.getElementById('mobile-timer').style.display = 'block';
+      const btn = document.querySelector('.btn-massive');
+      btn.innerText = "ESPERANDO AL STREAMER...";
+      btn.style.opacity = "0.5";
+      btn.style.pointerEvents = "none";
+      // Aquí a futuro enviaríamos el nombre del jugador a la base de datos
     }
 
+    // 2. Escuchar las órdenes del Dashboard
+    db.ref("salas/room_1").on("value", (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+
+      // Si el streamer inicia la pregunta
+      if (data.status === "question_active") {
+        document.getElementById('mobile-waiting').style.display = 'none';
+        document.getElementById('mobile-question').style.display = 'flex';
+        document.getElementById('mobile-timer').style.display = 'block';
+        
+        // Reiniciar los botones por si es una pregunta nueva
+        const allButtons = document.querySelectorAll('.btn-answer');
+        allButtons.forEach(btn => {
+          btn.classList.remove('selected', 'disabled');
+          btn.style.pointerEvents = 'auto'; 
+        });
+      } 
+      // Si el streamer vuelve a la sala de espera
+      else if (data.status === "waiting_players") {
+        document.getElementById('mobile-waiting').style.display = 'flex';
+        document.getElementById('mobile-question').style.display = 'none';
+        document.getElementById('mobile-timer').style.display = 'none';
+        
+        const btn = document.querySelector('.btn-massive');
+        btn.innerText = "ENTRAR A LA PARTIDA";
+        btn.style.opacity = "1";
+        btn.style.pointerEvents = "auto";
+      }
+    });
+
+    // 3. Lógica visual al tocar una respuesta
     function selectAnswer(buttonElement) {
-      // 1. Agregar clase de seleccionado al botón presionado
       buttonElement.classList.add('selected');
       
-      // 2. Bloquear y atenuar todos los demás botones
       const allButtons = document.querySelectorAll('.btn-answer');
       allButtons.forEach(btn => {
         if (btn !== buttonElement) {
           btn.classList.add('disabled');
         }
-        // Evita que se pueda hacer clic de nuevo
-        btn.onclick = null; 
+        btn.style.pointerEvents = 'none'; 
       });
       
-      // Aquí enviaríamos la respuesta por WebSocket al servidor
-      console.log("Respuesta enviada al servidor");
+      console.log("Respuesta seleccionada lista para enviar");
     }
   </script>
 </body>
