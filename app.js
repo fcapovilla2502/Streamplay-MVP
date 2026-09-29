@@ -1,6 +1,4 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-
+// 1. INICIALIZAR FIREBASE (Versión 8 directa, sin "import")
 const firebaseConfig = {
   apiKey: "AIzaSyDHU_KHVA5JezYLPed6Yg93fwCXUSa4qVc",
   authDomain: "streamplay-mvp.firebaseapp.com",
@@ -11,11 +9,10 @@ const firebaseConfig = {
   appId: "1:254252838564:web:2100d6b3a40d7ac7ce0031"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-// 2. Estado local del Dashboard
+// 2. ESTADO LOCAL DEL DASHBOARD
 let gameState = {
   status: "waiting_players",
   config: { title: "TRIVIA DEL GORDO" },
@@ -32,7 +29,7 @@ let gameState = {
   }
 };
 
-// 3. Renderizado del Dashboard
+// 3. RENDERIZADO DEL DASHBOARD
 function renderUI() {
   document.getElementById("screen-waiting").style.display = "none";
   document.getElementById("screen-question").style.display = "none";
@@ -49,20 +46,21 @@ function renderUI() {
     optionsContainer.innerHTML = "";
     
     gameState.current_state.question_data.options.forEach(opt => {
+      // Usamos onclick vacío por ahora, solo visual en el dashboard
       optionsContainer.innerHTML += `<button class="btn-option"><b>${opt.id}</b> — ${opt.text}</button>`;
     });
   }
 }
 
 // 4. ENVÍO DE DATOS A FIREBASE AL INICIAR PARTIDA
+// Nota: La función debe llamarse exactamente igual que en el onclick de tu index.html
 function startGame() {
   gameState.status = "question_active";
-  renderUI(); // Actualiza el dashboard
+  renderUI(); 
   
-  // Sobrescribe la base de datos en la sala "room_1"
   db.ref("salas/room_1").set(gameState);
 }
 
-// Iniciar estado por defecto (limpiar base de datos al recargar)
+// 5. ARRANQUE INICIAL
 db.ref("salas/room_1").set(gameState);
 renderUI();

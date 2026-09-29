@@ -168,7 +168,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
-  // 1. REEMPLAZA ESTO CON TU CÓDIGO firebaseConfig REAL
+  // Tu configuración exacta de Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyDHU_KHVA5JezYLPed6Yg93fwCXUSa4qVc",
     authDomain: "streamplay-mvp.firebaseapp.com",
@@ -184,7 +184,7 @@
   const panel = document.getElementById('overlay-panel');
   let timerInterval;
 
-  // 2. ESCUCHAR CAMBIOS DESDE EL DASHBOARD
+  // ESCUCHAR CAMBIOS DESDE EL DASHBOARD EN TIEMPO REAL
   db.ref("salas/room_1").on("value", (snapshot) => {
     const data = snapshot.val();
     if (!data) return;
