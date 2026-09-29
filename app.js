@@ -1,3 +1,6 @@
+// ==========================================
+// 1. CONFIGURACIÓN E INICIALIZACIÓN
+// ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyDHU_KHVA5JezYLPed6Yg93fwCXUSa4qVc",
   authDomain: "streamplay-mvp.firebaseapp.com",
@@ -11,6 +14,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// Variables Globales
 let questionBank = [];
 let currentQuestionIndex = 0;
 
@@ -18,11 +22,13 @@ let gameState = {
   status: "waiting_players",
   config: { title: "TRIVIA DEL GORDO" },
   current_state: {
-    question_data: null // Se llenará cuando carguemos el JSON
+    question_data: null 
   }
 };
 
-// 1. CARGAR PREGUNTAS DESDE EL ARCHIVO JSON
+// ==========================================
+// 2. CARGA DE DATOS (PREGUNTAS)
+// ==========================================
 fetch('preguntas.json?v=' + new Date().getTime())
   .then(response => response.json())
   .then(data => {
@@ -38,16 +44,19 @@ fetch('preguntas.json?v=' + new Date().getTime())
   })
   .catch(error => console.error("Error al cargar el JSON:", error));
 
-
-// 2. RENDERIZADO VISUAL DEL DASHBOARD
+// ==========================================
+// 3. ACTUALIZACIÓN VISUAL DEL DASHBOARD
+// ==========================================
 function renderUI() {
   document.getElementById("screen-waiting").style.display = "none";
   document.getElementById("screen-question").style.display = "none";
 
+  // Pantalla de LOBBY
   if (gameState.status === "waiting_players") {
     document.getElementById("screen-waiting").style.display = "block";
     document.getElementById("ui-title").innerText = gameState.config.title;
   } 
+  // Pantalla de JUEGO
   else if (gameState.status === "question_active" || gameState.status === "time_up") {
     document.getElementById("screen-question").style.display = "block";
     
@@ -56,14 +65,17 @@ function renderUI() {
     const optionsContainer = document.getElementById("ui-options");
     optionsContainer.innerHTML = "";
     
+    // Inyectar opciones (A, B, C, D)
     gameState.current_state.question_data.options.forEach(opt => {
       let extraStyle = "";
+      // Si se acabó el tiempo, pintamos la correcta de verde
       if (gameState.status === "time_up" && opt.id === gameState.current_state.question_data.correct_answer_id) {
         extraStyle = "background: rgba(0, 255, 0, 0.15); border-color: #00FF00;";
       }
       optionsContainer.innerHTML += `<button class="btn-option" style="${extraStyle}"><b>${opt.id}</b> — ${opt.text}</button>`;
     });
 
+    // Control de Botones
     if (gameState.status === "question_active") {
       document.getElementById("btn-stop").style.display = "block";
       document.getElementById("btn-next").style.display = "none";
@@ -82,7 +94,9 @@ function renderUI() {
   }
 }
 
-// 3. CONTROLES DEL JUEGO
+// ==========================================
+// 4. CONTROLES DEL JUEGO (BOTONES)
+// ==========================================
 function startGame() {
   currentQuestionIndex = 0;
   gameState.status = "question_active";
@@ -99,16 +113,23 @@ function nextQuestion() {
   db.ref("salas/room_1").set(gameState);
 }
 
-// FINALIZAR TIEMPO Y CALCULAR PUNTOS
+function returnToLobby() {
+  gameState.status = "waiting_players";
+  renderUI();
+  db.ref("salas/room_1").set(gameState);
+}
+
+// ==========================================
+// 5. MOTOR DE PUNTOS Y RANKING
+// ==========================================
 function stopTimer() {
   gameState.status = "time_up";
   renderUI();
   db.ref("salas/room_1").set(gameState);
 
-  // ¡LA MAGIA DE LOS PUNTOS!
   const correctId = gameState.current_state.question_data.correct_answer_id;
   
-  // Vamos a buscar qué respondieron los jugadores
+  // Evaluar respuestas y sumar puntos
   db.ref("salas/room_1/players").once("value", (snapshot) => {
     const players = snapshot.val();
     if (!players) return;
@@ -117,35 +138,41 @@ function stopTimer() {
     for (let playerId in players) {
       let player = players[playerId];
       
-      // Si el jugador respondió correctamente, le sumamos 100 puntos
+      // Si respondió bien, suma 100
       if (player.current_answer === correctId) {
         updates[playerId + "/score"] = (player.score || 0) + 100;
       }
     }
     
-    // Si alguien sumó puntos, mandamos la actualización masiva a Firebase
+    // Si hubo ganadores, enviamos los puntos a Firebase
     if (Object.keys(updates).length > 0) {
       db.ref("salas/room_1/players").update(updates);
     }
   });
 }
-// ESCUCHAR Y DIBUJAR EL RANKING EN TIEMPO REAL
+
+// Escuchar y dibujar el Leaderboard en tiempo real
 db.ref("salas/room_1/players").on("value", (snapshot) => {
   const players = snapshot.val();
   const listContainer = document.getElementById("leaderboard-list");
+  const playersCountUI = document.getElementById("players-count");
   
   if (!players) {
     document.getElementById("ui-leaderboard").style.display = "none";
+    if(playersCountUI) playersCountUI.innerText = "0";
     return;
   }
 
-  // Convertimos los jugadores a un Array y los ordenamos de mayor a menor puntaje
-  const playersArray = Object.values(players).sort((a, b) => b.score - a.score);
+  // Actualizar el contador de jugadores en el Lobby
+  const playersArray = Object.values(players);
+  if(playersCountUI) playersCountUI.innerText = playersArray.length;
+
+  // Ordenar de mayor a menor puntaje
+  playersArray.sort((a, b) => b.score - a.score);
   
   listContainer.innerHTML = "";
   playersArray.forEach((p, index) => {
     let position = index + 1;
-    // Asignamos medallas al Top 3
     let medal = position === 1 ? "🥇" : position === 2 ? "🥈" : position === 3 ? "🥉" : position + ".";
     
     listContainer.innerHTML += `
@@ -160,12 +187,5 @@ db.ref("salas/room_1/players").on("value", (snapshot) => {
     `;
   });
   
-  // Mostrar el panel de ranking si ya hay jugadores
   document.getElementById("ui-leaderboard").style.display = "block";
 });
-
-function returnToLobby() {
-  gameState.status = "waiting_players";
-  renderUI();
-  db.ref("salas/room_1").set(gameState);
-}

@@ -8,6 +8,7 @@
 </head>
 <body>
   <div id="app">
+    
     <!-- PANTALLA: ESPERANDO JUGADORES -->
     <div id="screen-waiting" class="screen">
       <div class="glass-card">
@@ -15,7 +16,7 @@
         <h1><span id="ui-title"></span></h1>
         <p class="subtitle">ESTADO: ESPERANDO JUGADORES</p>
         <div class="stats">
-          <p>Jugadores conectados: <span class="accent-cyan">426</span></p>
+          <p>Jugadores conectados: <span class="accent-cyan" id="players-count">Esperando...</span></p>
         </div>
         <button class="btn-primary" onclick="startGame()">INICIAR PARTIDA</button>
       </div>
@@ -24,46 +25,36 @@
     <!-- PANTALLA: PREGUNTA ACTIVA -->
     <div id="screen-question" class="screen" style="display: none;">
       <div class="glass-card">
-        <p class="question-number">PREGUNTA 04 / 20</p>
         <h2 id="ui-question-text"></h2>
-        <div id="ui-options" class="options-grid"></div>
+        
         <div id="ui-options" class="options-grid"></div>
         
-        <!-- NUEVOS BOTONES DE CONTROL -->
-        <div style="margin-top: 40px; display: flex; gap: 20px; justify-content: center;">
-          <button id="btn-stop" class="btn-primary" style="border-color: #ff4444; color: #ff4444; box-shadow: 0 0 15px rgba(255,0,0,0.2);" onclick="stopTimer()">FINALIZAR TIEMPO</button>
-          <button id="btn-lobby" class="btn-primary" style="display: none; border-color: var(--secondary);" onclick="returnToLobby()">VOLVER AL LOBBY</button>
-        </div>
-      </div>
-    </div>
         <div class="timer-bar"><div class="timer-fill"></div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- NUEVOS BOTONES DE CONTROL -->
+        
+        <!-- BOTONES DE CONTROL -->
         <div style="margin-top: 40px; display: flex; gap: 20px; justify-content: center;">
           <button id="btn-stop" class="btn-primary" style="border-color: #ff4444; color: #ff4444; box-shadow: 0 0 15px rgba(255,0,0,0.2);" onclick="stopTimer()">FINALIZAR TIEMPO</button>
           
-          <!-- BOTÓN NUEVO -->
           <button id="btn-next" class="btn-primary" style="display: none; border-color: #00FF00; color: #00FF00; box-shadow: 0 0 15px rgba(0,255,0,0.2);" onclick="nextQuestion()">SIGUIENTE PREGUNTA</button>
           
           <button id="btn-lobby" class="btn-primary" style="display: none; border-color: var(--secondary);" onclick="returnToLobby()">VOLVER AL LOBBY</button>
         </div>
+      </div>
+    </div>
 
-
-  <!-- Agregar Firebase ANT1ES de tu app.js -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    
-    <script src="app.js"></script>
-    
     <!-- PANEL DE RANKING (LEADERBOARD) -->
-        <div id="ui-leaderboard" style="margin-top: 50px; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; display: none;">
-          <h3 style="color: var(--secondary); margin-bottom: 15px; text-align: center; letter-spacing: 2px;">🏆 RANKING EN VIVO</h3>
-          <ul id="leaderboard-list" style="list-style: none; padding: 0; margin: 0;">
-            <!-- Aquí inyectaremos la lista de jugadores -->
-          </ul>
-        </div>
-  </body>
+    <div id="ui-leaderboard" style="margin-top: 50px; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; display: none;">
+      <h3 style="color: var(--secondary); margin-bottom: 15px; text-align: center; letter-spacing: 2px;">🏆 RANKING EN VIVO</h3>
+      <ul id="leaderboard-list" style="list-style: none; padding: 0; margin: 0;">
+        <!-- Aquí inyectaremos la lista de jugadores -->
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="app.js"></script>
+</body>
 </html>
