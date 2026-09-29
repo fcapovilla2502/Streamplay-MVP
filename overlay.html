@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STREAMPLAY - Overlay OBS</title>
+  <style>
+    :root {
+      --primary: #FF00FF;
+      --secondary: #00FFFF;
+      --text: #FFFFFF;
+      --glass-bg: rgba(10, 10, 15, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+    body {
+      /* Fondo transparente indispensable para OBS */
+      background-color: transparent; 
+      color: var(--text);
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end; /* Lo pegamos abajo tipo zócalo (lower third) */
+      align-items: center;
+      padding-bottom: 80px;
+    }
+
+    /* Contenedor principal estilo Glassmorphism */
+    .overlay-container {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      width: 1400px;
+      padding: 40px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 
+                  inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      position: relative;
+      transform: translateY(0);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Estado cuando está oculto (sin pregunta) */
+    .hidden {
+      opacity: 0;
+      transform: translateY(150px);
+      pointer-events: none;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .branding {
+      color: var(--primary);
+      font-weight: 800;
+      letter-spacing: 3px;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+    }
+
+    .timer-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 3px solid var(--secondary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--secondary);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    }
+
+    .question {
+      font-size: 2.8rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 40px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .option {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      padding: 25px;
+      font-size: 1.8rem;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .option .letter {
+      background: var(--primary);
+      color: white;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      margin-right: 20px;
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- El panel completo. Se le quita la clase "hidden" cuando el streamer inicia la pregunta -->
+  <div class="overlay-container" id="overlay-panel">
+    <div class="header">
+      <div class="branding">TRIVIA DEL GORDO</div>
+      <div class="timer-circle" id="timer">20</div>
+    </div>
+    
+    <div class="question">¿Cuál fue la primera consola de Sony?</div>
+    
+    <div class="options-grid">
+      <div class="option"><div class="letter">A</div> PLAYSTATION</div>
+      <div class="option"><div class="letter">B</div> NINTENDO 64</div>
+      <div class="option"><div class="letter">C</div> SEGA SATURN</div>
+      <div class="option"><div class="letter">D</div> DREAMCAST</div>
+    </div>
+  </div>
+
+  <script>
+    // Simulación simple para probar cómo se vería en vivo
+    // En el producto final, esto escucharía a tu servidor por WebSockets
+    const panel = document.getElementById('overlay-panel');
+    let timeLeft = 20;
+
+    // Para probar la animación, el panel se oculta al inicio y aparece a los 2 segundos
+    panel.classList.add('hidden');
+    
+    setTimeout(() => {
+      panel.classList.remove('hidden');
+      
+      // Simula la cuenta regresiva
+      const timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').innerText = timeLeft;
+        
+        if(timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById('timer').innerText = "0";
+          document.getElementById('timer').style.borderColor = "red";
+          document.getElementById('timer').style.color = "red";
+        }
+      }, 1000);
+    }, 2000);
+  </script>
+</body>
+</html>
