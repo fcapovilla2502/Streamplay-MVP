@@ -27,6 +27,15 @@
         <p class="question-number">PREGUNTA 04 / 20</p>
         <h2 id="ui-question-text"></h2>
         <div id="ui-options" class="options-grid"></div>
+        <div id="ui-options" class="options-grid"></div>
+        
+        <!-- NUEVOS BOTONES DE CONTROL -->
+        <div style="margin-top: 40px; display: flex; gap: 20px; justify-content: center;">
+          <button id="btn-stop" class="btn-primary" style="border-color: #ff4444; color: #ff4444; box-shadow: 0 0 15px rgba(255,0,0,0.2);" onclick="stopTimer()">FINALIZAR TIEMPO</button>
+          <button id="btn-lobby" class="btn-primary" style="display: none; border-color: var(--secondary);" onclick="returnToLobby()">VOLVER AL LOBBY</button>
+        </div>
+      </div>
+    </div>
         <div class="timer-bar"><div class="timer-fill"></div></div>
       </div>
     </div>

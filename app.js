@@ -1,4 +1,3 @@
-// 1. INICIALIZAR FIREBASE (Versión 8 directa, sin "import")
 const firebaseConfig = {
   apiKey: "AIzaSyDHU_KHVA5JezYLPed6Yg93fwCXUSa4qVc",
   authDomain: "streamplay-mvp.firebaseapp.com",
@@ -12,7 +11,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// 2. ESTADO LOCAL DEL DASHBOARD
 let gameState = {
   status: "waiting_players",
   config: { title: "TRIVIA DEL GORDO" },
@@ -24,12 +22,12 @@ let gameState = {
         { id: "B", text: "Nintendo 64" },
         { id: "C", text: "Sega Saturn" },
         { id: "D", text: "Dreamcast" }
-      ]
+      ],
+      correct_answer_id: "A" // <-- Agregado para saber cuál iluminar
     }
   }
 };
 
-// 3. RENDERIZADO DEL DASHBOARD
 function renderUI() {
   document.getElementById("screen-waiting").style.display = "none";
   document.getElementById("screen-question").style.display = "none";
@@ -38,7 +36,7 @@ function renderUI() {
     document.getElementById("screen-waiting").style.display = "block";
     document.getElementById("ui-title").innerText = gameState.config.title;
   } 
-  else if (gameState.status === "question_active") {
+  else if (gameState.status === "question_active" || gameState.status === "time_up") {
     document.getElementById("screen-question").style.display = "block";
     document.getElementById("ui-question-text").innerText = gameState.current_state.question_data.text;
     
@@ -46,21 +44,43 @@ function renderUI() {
     optionsContainer.innerHTML = "";
     
     gameState.current_state.question_data.options.forEach(opt => {
-      // Usamos onclick vacío por ahora, solo visual en el dashboard
-      optionsContainer.innerHTML += `<button class="btn-option"><b>${opt.id}</b> — ${opt.text}</button>`;
+      let extraStyle = "";
+      // Si el tiempo terminó, iluminamos la respuesta correcta en verde en tu tablero
+      if (gameState.status === "time_up" && opt.id === gameState.current_state.question_data.correct_answer_id) {
+        extraStyle = "background: rgba(0, 255, 0, 0.15); border-color: #00FF00;";
+      }
+      optionsContainer.innerHTML += `<button class="btn-option" style="${extraStyle}"><b>${opt.id}</b> — ${opt.text}</button>`;
     });
+
+    // Alternar qué botón de control se muestra
+    if (gameState.status === "question_active") {
+      document.getElementById("btn-stop").style.display = "block";
+      document.getElementById("btn-lobby").style.display = "none";
+    } else {
+      document.getElementById("btn-stop").style.display = "none";
+      document.getElementById("btn-lobby").style.display = "block";
+    }
   }
 }
 
-// 4. ENVÍO DE DATOS A FIREBASE AL INICIAR PARTIDA
-// Nota: La función debe llamarse exactamente igual que en el onclick de tu index.html
 function startGame() {
   gameState.status = "question_active";
-  renderUI(); 
-  
+  renderUI();
   db.ref("salas/room_1").set(gameState);
 }
 
-// 5. ARRANQUE INICIAL
+// NUEVAS FUNCIONES DE CONTROL
+function stopTimer() {
+  gameState.status = "time_up";
+  renderUI();
+  db.ref("salas/room_1").set(gameState);
+}
+
+function returnToLobby() {
+  gameState.status = "waiting_players";
+  renderUI();
+  db.ref("salas/room_1").set(gameState);
+}
+
 db.ref("salas/room_1").set(gameState);
 renderUI();

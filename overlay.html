@@ -197,7 +197,43 @@
       document.getElementById('timer').innerText = timeLeft;
       document.getElementById('timer').style.borderColor = "var(--secondary)";
       document.getElementById('timer').style.color = "var(--secondary)";
+      db.ref("salas/room_1").on("value", (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
+
+    if (data.status === "question_active") {
+      panel.classList.remove('hidden');
       
+      let timeLeft = 20;
+      document.getElementById('timer').innerText = timeLeft;
+      document.getElementById('timer').style.borderColor = "var(--secondary)";
+      document.getElementById('timer').style.color = "var(--secondary)";
+      
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').innerText = timeLeft;
+        
+        if(timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById('timer').innerText = "0";
+          document.getElementById('timer').style.borderColor = "red";
+          document.getElementById('timer').style.color = "red";
+        }
+      }, 1000);
+    } 
+    // NUEVA REGLA: Si el streamer detiene el tiempo
+    else if (data.status === "time_up") {
+      clearInterval(timerInterval); // Corta el reloj inmediatamente
+      document.getElementById('timer').innerText = "0";
+      document.getElementById('timer').style.borderColor = "red";
+      document.getElementById('timer').style.color = "red";
+    }
+    else if (data.status === "waiting_players") {
+      panel.classList.add('hidden');
+      clearInterval(timerInterval);
+    }
+  });
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         timeLeft--;
