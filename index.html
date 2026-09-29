@@ -42,8 +42,8 @@
       </div>
     </div>
 
-    <!-- PANEL DE RANKING (LEADERBOARD) -->
-    <div id="ui-leaderboard" style="margin-top: 50px; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; display: none;">
+    <!-- PANEL DE RANKING (LEADERBOARD) FLOTANTE -->
+    <div id="ui-leaderboard" style="position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 600px; background: rgba(10,10,15,0.95); border: 1px solid var(--primary); border-radius: 12px; padding: 20px; box-shadow: 0 0 30px rgba(255,0,255,0.2); z-index: 1000; display: none;">
       <h3 style="color: var(--secondary); margin-bottom: 15px; text-align: center; letter-spacing: 2px;">🏆 RANKING EN VIVO</h3>
       <ul id="leaderboard-list" style="list-style: none; padding: 0; margin: 0;">
         <!-- Aquí inyectaremos la lista de jugadores -->

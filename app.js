@@ -150,7 +150,7 @@ function stopTimer() {
   });
 }
 
-// Escuchar y dibujar el Leaderboard en tiempo real
+// ESCUCHAR Y DIBUJAR EL RANKING EN TIEMPO REAL
 db.ref("salas/room_1/players").on("value", (snapshot) => {
   const players = snapshot.val();
   const listContainer = document.getElementById("leaderboard-list");
@@ -162,25 +162,31 @@ db.ref("salas/room_1/players").on("value", (snapshot) => {
     return;
   }
 
+  // 1. Convertir a array y ELIMINAR datos nulos o corruptos
+  const playersArray = Object.values(players).filter(p => p !== null && typeof p === 'object');
+  
   // Actualizar el contador de jugadores en el Lobby
-  const playersArray = Object.values(players);
   if(playersCountUI) playersCountUI.innerText = playersArray.length;
 
-  // Ordenar de mayor a menor puntaje
-  playersArray.sort((a, b) => b.score - a.score);
+  // 2. Ordenar de mayor a menor puntaje
+  playersArray.sort((a, b) => (b.score || 0) - (a.score || 0));
   
   listContainer.innerHTML = "";
   playersArray.forEach((p, index) => {
     let position = index + 1;
     let medal = position === 1 ? "🥇" : position === 2 ? "🥈" : position === 3 ? "🥉" : position + ".";
     
+    // 3. Extracción ultra-segura del nombre
+    let safeName = (p.name && typeof p.name === 'string') ? p.name.toUpperCase() : "INVITADO";
+    let safeScore = p.score || 0;
+
     listContainer.innerHTML += `
       <li style="display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 1.2rem;">
         <span style="font-weight: bold; color: ${position <= 3 ? 'var(--secondary)' : '#fff'};">
-          ${medal} ${p.name.toUpperCase()}
+          ${medal} ${safeName}
         </span>
         <span style="color: var(--primary); font-weight: bold; text-shadow: 0 0 10px rgba(255,0,255,0.5);">
-          ${p.score} PTS
+          ${safeScore} PTS
         </span>
       </li>
     `;
