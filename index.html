@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STREAMPLAY - Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- PANTALLA: ESPERANDO JUGADORES -->
+    <div id="screen-waiting" class="screen">
+      <div class="glass-card">
+        <span class="live-badge">🔴 EN VIVO</span>
+        <h1><span id="ui-title"></span></h1>
+        <p class="subtitle">ESTADO: ESPERANDO JUGADORES</p>
+        <div class="stats">
+          <p>Jugadores conectados: <span class="accent-cyan">426</span></p>
+        </div>
+        <button class="btn-primary" onclick="startGame()">INICIAR PARTIDA</button>
+      </div>
+    </div>
+
+    <!-- PANTALLA: PREGUNTA ACTIVA -->
+    <div id="screen-question" class="screen" style="display: none;">
+      <div class="glass-card">
+        <p class="question-number">PREGUNTA 04 / 20</p>
+        <h2 id="ui-question-text"></h2>
+        <div id="ui-options" class="options-grid"></div>
+        <div class="timer-bar"><div class="timer-fill"></div></div>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

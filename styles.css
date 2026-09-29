@@ -1,0 +1,109 @@
+:root {
+  --bg-color: #05050A;
+  --primary: #FF00FF;
+  --secondary: #00FFFF;
+  --text: #FFFFFF;
+  --glass-bg: rgba(20, 20, 30, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-color);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #1a0b2e 0%, var(--bg-color) 100%);
+}
+
+.screen {
+  width: 100%;
+  max-width: 800px;
+  padding: 20px;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.live-badge {
+  background: rgba(255, 0, 0, 0.2);
+  color: #ff4444;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin: 20px 0 5px 0;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  color: var(--primary);
+  letter-spacing: 2px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.accent-cyan {
+  color: var(--secondary);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.btn-primary {
+  background: transparent;
+  color: var(--text);
+  border: 2px solid var(--primary);
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);
+  margin-top: 20px;
+}
+
+.btn-primary:hover {
+  background: var(--primary);
+  box-shadow: 0 0 30px rgba(255, 0, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn-option {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text);
+  padding: 20px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-option:hover {
+  background: rgba(0, 255, 255, 0.1);
+  border-color: var(--secondary);
+}
