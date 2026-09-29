@@ -228,14 +228,21 @@
         document.getElementById('mobile-question').style.display = 'flex';
         document.getElementById('mobile-timer').style.display = 'block';
         
-        const allButtons = document.querySelectorAll('.btn-answer');
-        allButtons.forEach(btn => {
-          btn.classList.remove('selected', 'disabled');
-          btn.style.pointerEvents = 'auto'; 
-          btn.style.background = "var(--glass-bg)";
-          btn.style.borderColor = "var(--glass-border)";
+        // 1. Inyectar el texto de la pregunta
+        const qData = data.current_state.question_data;
+        document.querySelector('.question-title').innerText = qData.text;
+        
+        // 2. Inyectar las opciones dinámicamente
+        const grid = document.querySelector('.answers-grid');
+        grid.innerHTML = ""; // Limpia las viejas
+        qData.options.forEach(opt => {
+          grid.innerHTML += `
+            <button class="btn-answer" onclick="selectAnswer(this)">
+              <span class="letter">${opt.id}</span> ${opt.text}
+            </button>
+          `;
         });
-      } 
+      }
       // ESTADO 2: TIEMPO TERMINADO
       else if (data.status === "time_up") {
         const correctId = data.current_state.question_data.correct_answer_id;

@@ -191,27 +191,40 @@
       const data = snapshot.val();
       if (!data) return;
 
-      if (data.status === "question_active") {
-        panel.classList.remove('hidden');
-        
-        let timeLeft = 20;
+    if (data.status === "question_active") {
+      panel.classList.remove('hidden');
+      
+      // 1. Inyectar pregunta y opciones en el Overlay
+      const qData = data.current_state.question_data;
+      document.querySelector('.question').innerText = qData.text;
+      
+      const grid = document.querySelector('.options-grid');
+      grid.innerHTML = ""; 
+      qData.options.forEach(opt => {
+        grid.innerHTML += `
+          <div class="option"><div class="letter">${opt.id}</div> ${opt.text}</div>
+        `;
+      });
+      
+      // Lógica del temporizador
+      let timeLeft = 20;
+      document.getElementById('timer').innerText = timeLeft;
+      document.getElementById('timer').style.borderColor = "var(--secondary)";
+      document.getElementById('timer').style.color = "var(--secondary)";
+      
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
         document.getElementById('timer').innerText = timeLeft;
-        document.getElementById('timer').style.borderColor = "var(--secondary)";
-        document.getElementById('timer').style.color = "var(--secondary)";
         
-        clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-          timeLeft--;
-          document.getElementById('timer').innerText = timeLeft;
-          
-          if(timeLeft <= 0) {
-            clearInterval(timerInterval);
-            document.getElementById('timer').innerText = "0";
-            document.getElementById('timer').style.borderColor = "red";
-            document.getElementById('timer').style.color = "red";
-          }
-        }, 1000);
-      } 
+        if(timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById('timer').innerText = "0";
+          document.getElementById('timer').style.borderColor = "red";
+          document.getElementById('timer').style.color = "red";
+        }
+      }, 1000);
+    }
       // Si el streamer detiene el tiempo desde el Dashboard
       else if (data.status === "time_up") {
         clearInterval(timerInterval); 
