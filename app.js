@@ -99,11 +99,70 @@ function nextQuestion() {
   db.ref("salas/room_1").set(gameState);
 }
 
+// FINALIZAR TIEMPO Y CALCULAR PUNTOS
 function stopTimer() {
   gameState.status = "time_up";
   renderUI();
   db.ref("salas/room_1").set(gameState);
+
+  // ¡LA MAGIA DE LOS PUNTOS!
+  const correctId = gameState.current_state.question_data.correct_answer_id;
+  
+  // Vamos a buscar qué respondieron los jugadores
+  db.ref("salas/room_1/players").once("value", (snapshot) => {
+    const players = snapshot.val();
+    if (!players) return;
+
+    let updates = {};
+    for (let playerId in players) {
+      let player = players[playerId];
+      
+      // Si el jugador respondió correctamente, le sumamos 100 puntos
+      if (player.current_answer === correctId) {
+        updates[playerId + "/score"] = (player.score || 0) + 100;
+      }
+    }
+    
+    // Si alguien sumó puntos, mandamos la actualización masiva a Firebase
+    if (Object.keys(updates).length > 0) {
+      db.ref("salas/room_1/players").update(updates);
+    }
+  });
 }
+// ESCUCHAR Y DIBUJAR EL RANKING EN TIEMPO REAL
+db.ref("salas/room_1/players").on("value", (snapshot) => {
+  const players = snapshot.val();
+  const listContainer = document.getElementById("leaderboard-list");
+  
+  if (!players) {
+    document.getElementById("ui-leaderboard").style.display = "none";
+    return;
+  }
+
+  // Convertimos los jugadores a un Array y los ordenamos de mayor a menor puntaje
+  const playersArray = Object.values(players).sort((a, b) => b.score - a.score);
+  
+  listContainer.innerHTML = "";
+  playersArray.forEach((p, index) => {
+    let position = index + 1;
+    // Asignamos medallas al Top 3
+    let medal = position === 1 ? "🥇" : position === 2 ? "🥈" : position === 3 ? "🥉" : position + ".";
+    
+    listContainer.innerHTML += `
+      <li style="display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 1.2rem;">
+        <span style="font-weight: bold; color: ${position <= 3 ? 'var(--secondary)' : '#fff'};">
+          ${medal} ${p.name.toUpperCase()}
+        </span>
+        <span style="color: var(--primary); font-weight: bold; text-shadow: 0 0 10px rgba(255,0,255,0.5);">
+          ${p.score} PTS
+        </span>
+      </li>
+    `;
+  });
+  
+  // Mostrar el panel de ranking si ya hay jugadores
+  document.getElementById("ui-leaderboard").style.display = "block";
+});
 
 function returnToLobby() {
   gameState.status = "waiting_players";
