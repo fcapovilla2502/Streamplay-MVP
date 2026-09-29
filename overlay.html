@@ -185,7 +185,7 @@
   const panel = document.getElementById('overlay-panel');
   let timerInterval;
 
-  // ESCUCHAR CAMBIOS DESDE EL DASHBOARD EN TIEMPO REAL
+  // ESCUCHAR CAMBIOS DESDE EL DASHBOARD EN TIEMPO REALo
   db.ref("salas/room_1").on("value", (snapshot) => {
     const data = snapshot.val();
     if (!data) return;
