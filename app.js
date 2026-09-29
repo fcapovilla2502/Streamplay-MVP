@@ -11,50 +11,35 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// NUESTRO BANCO DE PREGUNTAS DINÁMICO
-const questionBank = [
-  {
-    text: "¿Quién forjó el Anillo Único?",
-    options: [
-      { id: "A", text: "Elrond" },
-      { id: "B", text: "Sauron" },
-      { id: "C", text: "Celebrimbor" },
-      { id: "D", text: "Isildur" }
-    ],
-    correct_answer_id: "B"
-  },
-  {
-    text: "¿Cómo se llama la espada reconstruida de Aragorn?",
-    options: [
-      { id: "A", text: "Andúril" },
-      { id: "B", text: "Narsil" },
-      { id: "C", text: "Glamdring" },
-      { id: "D", text: "Dardo" }
-    ],
-    correct_answer_id: "A"
-  },
-  {
-    text: "¿En qué monte fue destruido el Anillo?",
-    options: [
-      { id: "A", text: "Monte Gundabad" },
-      { id: "B", text: "Erebor" },
-      { id: "C", text: "Monte del Destino" },
-      { id: "D", text: "Caradhras" }
-    ],
-    correct_answer_id: "C"
-  }
-];
-
-let currentQuestionIndex = 0; // Lleva la cuenta de la pregunta actual
+let questionBank = [];
+let currentQuestionIndex = 0;
 
 let gameState = {
   status: "waiting_players",
   config: { title: "TRIVIA DEL GORDO" },
   current_state: {
-    question_data: questionBank[0] // Carga la primera por defecto
+    question_data: null // Se llenará cuando carguemos el JSON
   }
 };
 
+// 1. CARGAR PREGUNTAS DESDE EL ARCHIVO JSON
+fetch('preguntas.json?v=' + new Date().getTime())
+  .then(response => response.json())
+  .then(data => {
+    questionBank = data;
+    console.log("¡Preguntas cargadas con éxito! Total:", questionBank.length);
+    
+    // Dejamos lista la primera pregunta en memoria
+    gameState.current_state.question_data = questionBank[0];
+    
+    // Inicializamos la base de datos y la pantalla
+    db.ref("salas/room_1").set(gameState);
+    renderUI();
+  })
+  .catch(error => console.error("Error al cargar el JSON:", error));
+
+
+// 2. RENDERIZADO VISUAL DEL DASHBOARD
 function renderUI() {
   document.getElementById("screen-waiting").style.display = "none";
   document.getElementById("screen-question").style.display = "none";
@@ -66,7 +51,6 @@ function renderUI() {
   else if (gameState.status === "question_active" || gameState.status === "time_up") {
     document.getElementById("screen-question").style.display = "block";
     
-    // Le agregamos un pequeño contador visual al título (Ej: Pregunta 1/3)
     document.getElementById("ui-question-text").innerText = `(${currentQuestionIndex + 1}/${questionBank.length}) ` + gameState.current_state.question_data.text;
     
     const optionsContainer = document.getElementById("ui-options");
@@ -80,7 +64,6 @@ function renderUI() {
       optionsContainer.innerHTML += `<button class="btn-option" style="${extraStyle}"><b>${opt.id}</b> — ${opt.text}</button>`;
     });
 
-    // LÓGICA DE BOTONES DINÁMICA
     if (gameState.status === "question_active") {
       document.getElementById("btn-stop").style.display = "block";
       document.getElementById("btn-next").style.display = "none";
@@ -88,7 +71,6 @@ function renderUI() {
     } else if (gameState.status === "time_up") {
       document.getElementById("btn-stop").style.display = "none";
       
-      // Si todavía quedan preguntas, mostrar "Siguiente". Si no, mostrar "Volver al Lobby".
       if (currentQuestionIndex < questionBank.length - 1) {
         document.getElementById("btn-next").style.display = "block";
         document.getElementById("btn-lobby").style.display = "none";
@@ -100,18 +82,17 @@ function renderUI() {
   }
 }
 
-// INICIAR EL JUEGO DESDE CERO
+// 3. CONTROLES DEL JUEGO
 function startGame() {
-  currentQuestionIndex = 0; // Reinicia a la pregunta 1
+  currentQuestionIndex = 0;
   gameState.status = "question_active";
   gameState.current_state.question_data = questionBank[currentQuestionIndex];
   renderUI();
   db.ref("salas/room_1").set(gameState);
 }
 
-// PASAR A LA SIGUIENTE PREGUNTA
 function nextQuestion() {
-  currentQuestionIndex++; // Suma 1 al contador
+  currentQuestionIndex++;
   gameState.status = "question_active";
   gameState.current_state.question_data = questionBank[currentQuestionIndex];
   renderUI();
@@ -129,6 +110,3 @@ function returnToLobby() {
   renderUI();
   db.ref("salas/room_1").set(gameState);
 }
-
-db.ref("salas/room_1").set(gameState);
-renderUI();
