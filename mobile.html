@@ -276,6 +276,37 @@
           });
         }
       } 
+     // 2. ESCUCHAR LAS ÓRDENES DEL DASHBOARD
+    db.ref("salas/room_1").on("value", (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+
+      // ESTADO 1: PREGUNTA ACTIVA
+      if (data.status === "question_active") {
+        document.getElementById('mobile-waiting').style.display = 'none';
+        document.getElementById('mobile-question').style.display = 'flex';
+        document.getElementById('mobile-timer').style.display = 'block';
+        
+        const qData = data.current_state.question_data;
+        const currentDisplayedQuestion = document.querySelector('.question-title').innerText;
+
+        // ¡LA SOLUCIÓN MÁGICA!
+        // Solo inyectamos los botones si el texto de la pregunta es NUEVO.
+        // Así evitamos que se borre tu selección al enviar la respuesta a Firebase.
+        if (currentDisplayedQuestion !== qData.text) {
+          document.querySelector('.question-title').innerText = qData.text;
+          
+          const grid = document.querySelector('.answers-grid');
+          grid.innerHTML = ""; 
+          qData.options.forEach(opt => {
+            grid.innerHTML += `
+              <button class="btn-answer" onclick="selectAnswer(this)">
+                <span class="letter">${opt.id}</span> ${opt.text}
+              </button>
+            `;
+          });
+        }
+      } 
       // ESTADO 2: TIEMPO TERMINADO
       else if (data.status === "time_up") {
         const correctId = data.current_state.question_data.correct_answer_id;
@@ -284,7 +315,6 @@
         allButtons.forEach(btn => {
           btn.style.pointerEvents = 'none'; // Bloquear clics
           
-          // .trim() elimina espacios invisibles para comparar correctamente
           const letter = btn.querySelector('.letter').innerText.trim(); 
           
           if (letter === correctId) {
@@ -309,7 +339,6 @@
         document.getElementById('mobile-question').style.display = 'none';
         document.getElementById('mobile-timer').style.display = 'none';
         
-        // Si el usuario ya está logueado, mantenemos el botón en "Esperando..."
         const btn = document.getElementById('btn-login');
         if (myPlayerId === "") {
           btn.innerHTML = "<span style='font-size: 1.2rem; font-weight: bold;'>🔑 ENTRAR CON GOOGLE</span>";
@@ -345,4 +374,4 @@
     }
   </script>
 </body>
-</html>
+</html> 
