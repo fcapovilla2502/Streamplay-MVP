@@ -16,7 +16,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
 
     body {
-      /* Fondo transparente indispensable para OBS */
       background-color: transparent; 
       color: var(--text);
       width: 1920px;
@@ -24,12 +23,11 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end; /* Lo pegamos abajo tipo zócalo (lower third) */
+      justify-content: flex-end; 
       align-items: center;
       padding-bottom: 80px;
     }
 
-    /* Contenedor principal estilo Glassmorphism */
     .overlay-container {
       background: var(--glass-bg);
       backdrop-filter: blur(16px);
@@ -37,14 +35,12 @@
       border-radius: 24px;
       width: 1400px;
       padding: 40px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 
-                  inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
       position: relative;
       transform: translateY(0);
       transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    /* Estado cuando está oculto (sin pregunta) */
     .hidden {
       opacity: 0;
       transform: translateY(150px);
@@ -104,6 +100,7 @@
       border-radius: 16px;
       display: flex;
       align-items: center;
+      transition: all 0.3s ease;
     }
 
     .option .letter {
@@ -118,56 +115,25 @@
       margin-right: 20px;
       font-weight: bold;
       box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+      transition: all 0.3s ease;
     }
   </style>
 </head>
 <body>
 
-  <!-- El panel completo. Se le quita la clase "hidden" cuando el streamer inicia la pregunta -->
-  <div class="overlay-container" id="overlay-panel">
+  <div class="overlay-container hidden" id="overlay-panel">
     <div class="header">
       <div class="branding">TRIVIA DEL GORDO</div>
       <div class="timer-circle" id="timer">20</div>
     </div>
     
-    <div class="question">¿Cuál fue la primera consola de Sony?</div>
+    <div class="question">Cargando pregunta...</div>
     
     <div class="options-grid">
-      <div class="option"><div class="letter">A</div> PLAYSTATION</div>
-      <div class="option"><div class="letter">B</div> NINTENDO 64</div>
-      <div class="option"><div class="letter">C</div> SEGA SATURN</div>
-      <div class="option"><div class="letter">D</div> DREAMCAST</div>
+      <!-- Las opciones se inyectarán aquí -->
     </div>
   </div>
 
-  <script>
-    // Simulación simple para probar cómo se vería en vivo
-    // En el producto final, esto escucharía a tu servidor por WebSockets
-    const previewPanel = document.getElementById('overlay-panel');
-    let timeLeft = 20;
-
-    // Para probar la animación, el panel se oculta al inicio y aparece a los 2 segundos
-    previewPanel.classList.add('hidden');
-    
-    setTimeout(() => {
-      previewPanel.classList.remove('hidden');
-      
-      // Simula la cuenta regresiva
-      const timerInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById('timer').innerText = timeLeft;
-        
-        if(timeLeft <= 0) {
-          clearInterval(timerInterval);
-          document.getElementById('timer').innerText = "0";
-          document.getElementById('timer').style.borderColor = "red";
-          document.getElementById('timer').style.color = "red";
-        }
-      }, 1000);
-    }, 2000);
-    </script>
-<!-- Asegúrate de borrar todo el script de "simulación" que tenías antes -->
-  
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script>
@@ -191,48 +157,50 @@
       const data = snapshot.val();
       if (!data) return;
 
-    if (data.status === "question_active") {
-      panel.classList.remove('hidden');
-      
-      // 1. Inyectar pregunta y opciones en el Overlay
-      const qData = data.current_state.question_data;
-      document.querySelector('.question').innerText = qData.text;
-      
-      const grid = document.querySelector('.options-grid');
-      grid.innerHTML = ""; 
-      qData.options.forEach(opt => {
-        grid.innerHTML += `
-          <div class="option"><div class="letter">${opt.id}</div> ${opt.text}</div>
-        `;
-      });
-      
-      // Lógica del temporizador
-      let timeLeft = 20;
-      document.getElementById('timer').innerText = timeLeft;
-      document.getElementById('timer').style.borderColor = "var(--secondary)";
-      document.getElementById('timer').style.color = "var(--secondary)";
-      
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById('timer').innerText = timeLeft;
+      // ESTADO 1: PREGUNTA ACTIVA
+      if (data.status === "question_active") {
+        panel.classList.remove('hidden');
         
-        if(timeLeft <= 0) {
-          clearInterval(timerInterval);
-          document.getElementById('timer').innerText = "0";
-          document.getElementById('timer').style.borderColor = "red";
-          document.getElementById('timer').style.color = "red";
-        }
-      }, 1000);
+        // Inyectar pregunta y opciones en el Overlay
+        const qData = data.current_state.question_data;
+        document.querySelector('.question').innerText = qData.text;
+        
+        const grid = document.querySelector('.options-grid');
+        grid.innerHTML = ""; 
+        qData.options.forEach(opt => {
+          grid.innerHTML += `
+            <div class="option"><div class="letter">${opt.id}</div> ${opt.text}</div>
+          `;
+        });
+        
+        // Lógica del temporizador
+        let timeLeft = 20;
+        document.getElementById('timer').innerText = timeLeft;
+        document.getElementById('timer').style.borderColor = "var(--secondary)";
+        document.getElementById('timer').style.color = "var(--secondary)";
+        
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          document.getElementById('timer').innerText = timeLeft;
+          
+          if(timeLeft <= 0) {
+            clearInterval(timerInterval);
+            document.getElementById('timer').innerText = "0";
+            document.getElementById('timer').style.borderColor = "red";
+            document.getElementById('timer').style.color = "red";
+          }
+        }, 1000);
+      } 
       
-     // Si el streamer detiene el tiempo desde el Dashboard
+      // ESTADO 2: TIEMPO TERMINADO
       else if (data.status === "time_up") {
         clearInterval(timerInterval); 
         document.getElementById('timer').innerText = "0";
         document.getElementById('timer').style.borderColor = "red";
         document.getElementById('timer').style.color = "red";
 
-        // ¡NUEVO! Iluminar la respuesta correcta en el Overlay
+        // Iluminar la respuesta correcta en el Overlay
         const correctId = data.current_state.question_data.correct_answer_id;
         const allOptions = document.querySelectorAll('.option');
         
@@ -247,11 +215,18 @@
             opt.querySelector('.letter').style.background = "#00FF00";
             opt.querySelector('.letter').style.color = "#000";
           } else {
-            // Oscurecer las incorrectas para dar dramatismo
+            // Oscurecer las incorrectas
             opt.style.opacity = "0.3";
           }
         });
       }
+      
+      // ESTADO 3: VOLVER AL LOBBY
+      else if (data.status === "waiting_players") {
+        panel.classList.add('hidden');
+        clearInterval(timerInterval);
+      }
+    });
   </script>
 </body>
 </html>
