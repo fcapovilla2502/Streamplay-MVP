@@ -5,7 +5,7 @@
       { "id": "A", "text": "Elrond" },
       { "id": "B", "text": "Sauron" },
       { "id": "C", "text": "Celebrimbor" },
-      { "id": "D", "text": "Isildur" }
+      { "id": "D", "text": "Gollum" }
     ],
     "correct_answer_id": "B"
   },
@@ -15,7 +15,7 @@
       { "id": "A", "text": "Andúril" },
       { "id": "B", "text": "Narsil" },
       { "id": "C", "text": "Glamdring" },
-      { "id": "D", "text": "Dardo" }
+      { "id": "D", "text": "Frodo" }
     ],
     "correct_answer_id": "A"
   },
