@@ -35,11 +35,10 @@ fetch('preguntas.json?v=' + new Date().getTime())
     questionBank = data;
     console.log("¡Preguntas cargadas con éxito! Total:", questionBank.length);
     
-    // Dejamos lista la primera pregunta en memoria
     gameState.current_state.question_data = questionBank[0];
     
-    // Inicializamos la base de datos y la pantalla
-    db.ref("salas/room_1").set(gameState);
+    // ¡CORRECCIÓN!: Usamos .update() para no borrar a los jugadores al recargar el Dashboard
+    db.ref("salas/room_1").update(gameState);
     renderUI();
   })
   .catch(error => console.error("Error al cargar el JSON:", error));
@@ -51,12 +50,10 @@ function renderUI() {
   document.getElementById("screen-waiting").style.display = "none";
   document.getElementById("screen-question").style.display = "none";
 
-  // Pantalla de LOBBY
   if (gameState.status === "waiting_players") {
     document.getElementById("screen-waiting").style.display = "block";
     document.getElementById("ui-title").innerText = gameState.config.title;
   } 
-  // Pantalla de JUEGO
   else if (gameState.status === "question_active" || gameState.status === "time_up") {
     document.getElementById("screen-question").style.display = "block";
     
@@ -65,17 +62,14 @@ function renderUI() {
     const optionsContainer = document.getElementById("ui-options");
     optionsContainer.innerHTML = "";
     
-    // Inyectar opciones (A, B, C, D)
     gameState.current_state.question_data.options.forEach(opt => {
       let extraStyle = "";
-      // Si se acabó el tiempo, pintamos la correcta de verde
       if (gameState.status === "time_up" && opt.id === gameState.current_state.question_data.correct_answer_id) {
         extraStyle = "background: rgba(0, 255, 0, 0.15); border-color: #00FF00;";
       }
       optionsContainer.innerHTML += `<button class="btn-option" style="${extraStyle}"><b>${opt.id}</b> — ${opt.text}</button>`;
     });
 
-    // Control de Botones
     if (gameState.status === "question_active") {
       document.getElementById("btn-stop").style.display = "block";
       document.getElementById("btn-next").style.display = "none";
@@ -102,7 +96,8 @@ function startGame() {
   gameState.status = "question_active";
   gameState.current_state.question_data = questionBank[currentQuestionIndex];
   renderUI();
-  db.ref("salas/room_1").set(gameState);
+  // ¡CORRECCIÓN!: .update() en vez de .set()
+  db.ref("salas/room_1").update(gameState);
 }
 
 function nextQuestion() {
@@ -110,13 +105,15 @@ function nextQuestion() {
   gameState.status = "question_active";
   gameState.current_state.question_data = questionBank[currentQuestionIndex];
   renderUI();
-  db.ref("salas/room_1").set(gameState);
+  // ¡CORRECCIÓN!: .update() en vez de .set()
+  db.ref("salas/room_1").update(gameState);
 }
 
 function returnToLobby() {
   gameState.status = "waiting_players";
   renderUI();
-  db.ref("salas/room_1").set(gameState);
+  // ¡CORRECCIÓN!: .update() en vez de .set()
+  db.ref("salas/room_1").update(gameState);
 }
 
 // ==========================================
@@ -125,7 +122,9 @@ function returnToLobby() {
 function stopTimer() {
   gameState.status = "time_up";
   renderUI();
-  db.ref("salas/room_1").set(gameState);
+  
+  // ¡CORRECCIÓN!: .update() evita borrar las respuestas de los jugadores
+  db.ref("salas/room_1").update(gameState);
 
   const correctId = gameState.current_state.question_data.correct_answer_id;
   
