@@ -40,6 +40,18 @@
       </div>
     </div>
   </div>
+
+  <!-- NUEVOS BOTONES DE CONTROL -->
+        <div style="margin-top: 40px; display: flex; gap: 20px; justify-content: center;">
+          <button id="btn-stop" class="btn-primary" style="border-color: #ff4444; color: #ff4444; box-shadow: 0 0 15px rgba(255,0,0,0.2);" onclick="stopTimer()">FINALIZAR TIEMPO</button>
+          
+          <!-- BOTÓN NUEVO -->
+          <button id="btn-next" class="btn-primary" style="display: none; border-color: #00FF00; color: #00FF00; box-shadow: 0 0 15px rgba(0,255,0,0.2);" onclick="nextQuestion()">SIGUIENTE PREGUNTA</button>
+          
+          <button id="btn-lobby" class="btn-primary" style="display: none; border-color: var(--secondary);" onclick="returnToLobby()">VOLVER AL LOBBY</button>
+        </div>
+
+        
   <!-- Agregar Firebase ANT1ES de tu app.js -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
