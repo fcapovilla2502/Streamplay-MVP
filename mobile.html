@@ -223,6 +223,13 @@
         btn.style.borderColor = "var(--primary)";
         btn.style.opacity = "0.5";
         btn.style.pointerEvents = "none";
+
+        // ¡LA SOLUCIÓN! Le avisamos a la base de datos que este jugador volvió/sigue aquí.
+        // Usamos .update() para NO borrarle los puntos si es que ya tenía.
+        db.ref("salas/room_1/players/" + myPlayerId).update({
+          name: myPlayerName,
+          photo: user.photoURL
+        });
       }
     });
 
