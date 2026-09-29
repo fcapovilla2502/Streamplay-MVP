@@ -165,37 +165,30 @@
         }
       }, 1000);
     }, 2000);
- <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
+  // 1. REEMPLAZA ESTO CON TU CÓDIGO firebaseConfig REAL
   const firebaseConfig = {
-    // PEGA AQUÍ TU CONFIGURACIÓN EXACTA
-    databaseURL: "https://streamplay-mvp-default-rtdb.firebaseio.com"
+    apiKey: "TU_API_KEY",
+    authDomain: "TU_DOMINIO.firebaseapp.com",
+    databaseURL: "https://streamplay-mvp-default-rtdb.firebaseio.com",
+    projectId: "TU_PROJECT_ID",
+    storageBucket: "TU_BUCKET.appspot.com",
+    messagingSenderId: "TU_SENDER",
+    appId: "TU_APP_ID"
   };
   
-  // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const panel = document.getElementById('overlay-panel');
+  let timerInterval;
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDHU_KHVA5JezYLPed6Yg93fwCXUSa4qVc",
-  authDomain: "streamplay-mvp.firebaseapp.com",
-  databaseURL: "https://streamplay-mvp-default-rtdb.firebaseio.com",
-  projectId: "streamplay-mvp",
-  storageBucket: "streamplay-mvp.firebasestorage.app",
-  messagingSenderId: "254252838564",
-  appId: "1:254252838564:web:2100d6b3a40d7ac7ce0031"
-};
+  // 2. ESCUCHAR CAMBIOS DESDE EL DASHBOARD
+  db.ref("salas/room_1").on("value", (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const panel = document.getElementById('overlay-panel');
-let timerInterval;
-
-    // Si el estado cambia a pregunta activa, mostrar overlay y arrancar tiempo
     if (data.status === "question_active") {
       panel.classList.remove('hidden');
       
@@ -217,7 +210,6 @@ let timerInterval;
         }
       }, 1000);
     } 
-    // Si vuelve a espera, ocultar el panel
     else if (data.status === "waiting_players") {
       panel.classList.add('hidden');
       clearInterval(timerInterval);
