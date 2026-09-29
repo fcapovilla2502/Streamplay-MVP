@@ -1,0 +1,32 @@
+[
+  {
+    "text": "¿Quién forjó el Anillo Único?",
+    "options": [
+      { "id": "A", "text": "Elrond" },
+      { "id": "B", "text": "Sauron" },
+      { "id": "C", "text": "Celebrimbor" },
+      { "id": "D", "text": "Isildur" }
+    ],
+    "correct_answer_id": "B"
+  },
+  {
+    "text": "¿Cómo se llama la espada reconstruida de Aragorn?",
+    "options": [
+      { "id": "A", "text": "Andúril" },
+      { "id": "B", "text": "Narsil" },
+      { "id": "C", "text": "Glamdring" },
+      { "id": "D", "text": "Dardo" }
+    ],
+    "correct_answer_id": "A"
+  },
+  {
+    "text": "¿En qué monte fue destruido el Anillo?",
+    "options": [
+      { "id": "A", "text": "Monte Gundabad" },
+      { "id": "B", "text": "Erebor" },
+      { "id": "C", "text": "Monte del Destino" },
+      { "id": "D", "text": "Caradhras" }
+    ],
+    "correct_answer_id": "C"
+  }
+]
