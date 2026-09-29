@@ -143,14 +143,14 @@
   <script>
     // Simulación simple para probar cómo se vería en vivo
     // En el producto final, esto escucharía a tu servidor por WebSockets
-    const panel = document.getElementById('overlay-panel');
+    const previewPanel = document.getElementById('overlay-panel');
     let timeLeft = 20;
 
     // Para probar la animación, el panel se oculta al inicio y aparece a los 2 segundos
-    panel.classList.add('hidden');
+    previewPanel.classList.add('hidden');
     
     setTimeout(() => {
-      panel.classList.remove('hidden');
+      previewPanel.classList.remove('hidden');
       
       // Simula la cuenta regresiva
       const timerInterval = setInterval(() => {
@@ -165,6 +165,7 @@
         }
       }, 1000);
     }, 2000);
+    </script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
