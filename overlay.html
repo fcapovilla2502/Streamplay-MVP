@@ -225,19 +225,33 @@
         }
       }, 1000);
     }
-      // Si el streamer detiene el tiempo desde el Dashboard
+     // Si el streamer detiene el tiempo desde el Dashboard
       else if (data.status === "time_up") {
         clearInterval(timerInterval); 
         document.getElementById('timer').innerText = "0";
         document.getElementById('timer').style.borderColor = "red";
         document.getElementById('timer').style.color = "red";
+
+        // ¡NUEVO! Iluminar la respuesta correcta en el Overlay
+        const correctId = data.current_state.question_data.correct_answer_id;
+        const allOptions = document.querySelectorAll('.option');
+        
+        allOptions.forEach(opt => {
+          const letter = opt.querySelector('.letter').innerText.trim();
+          
+          if (letter === correctId) {
+            // Estilo para la correcta (Verde brillante)
+            opt.style.background = "rgba(0, 255, 0, 0.2)";
+            opt.style.borderColor = "#00FF00";
+            opt.style.boxShadow = "0 0 30px rgba(0, 255, 0, 0.4)";
+            opt.querySelector('.letter').style.background = "#00FF00";
+            opt.querySelector('.letter').style.color = "#000";
+          } else {
+            // Oscurecer las incorrectas para dar dramatismo
+            opt.style.opacity = "0.3";
+          }
+        });
       }
-      // Si el streamer vuelve al lobby
-      else if (data.status === "waiting_players") {
-        panel.classList.add('hidden');
-        clearInterval(timerInterval);
-      }
-    });
   </script>
 </body>
 </html>
